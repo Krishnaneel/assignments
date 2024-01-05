@@ -41,9 +41,74 @@
  */
   const express = require('express');
   const bodyParser = require('body-parser');
+  const port = 3030;
   
   const app = express();
-  
   app.use(bodyParser.json());
+
+  const todos = [];
+
+  app.get("/todos",(req,res)=>{
+
+    if(todos.length==0) res.status(404).send("No todos left! :)")
+    return res.status(200).json(todos);
+
+  })
+
+  app.get("/todos/:id",(req,res)=>{
+    
+    const id = req.params.id;
+    // const selectedObj = {};
+    todos.filter((todo)=>{
+      if(todo.id==id) return res.status(200).json(todo);
+    })
+    return res.status(404).send("Error: Not Found");
+  })
+
+  app.post("/todos",(req,res)=>{
+
+    const min=100,max=999;
+    const id = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    const todo = req.body;
+    todo["id"]=id;
+    todos.push(todo);
+    res.status(201).json(todo);
+  })
+
+  app.put("/todos/:id",(req,res)=>{
+    
+    const id = req.params.id;
+
+    todos.filter((todo)=>{
+      if(todo.id===id){
+        todo.description=req.body.description;
+        todo.title=req.body.title;
+        res.status(200).json(todo);
+      }
+    })
+    res.status(404).send("Error: 404 not found");
+  })
+
+  app.delete("/todos/:id",(req,res)=>{
+    
+    const id = req.params.id;
+
+    for(let i=0;i<todos.length;i++){
+      if(todos[i].id==id){
+        todos.splice(i,1);
+        res.status(200).send("Deleted!");
+      }
+    }
+    res.status(404).send("Error: Not Found");
+  })
+
+  app.use((req,res,next)=>{
+    res.status(404).send();
+  })
+
+  app.listen(port,()=>{
+    console.log(`Listening to port ${port}...`);
+  });
   
   module.exports = app;

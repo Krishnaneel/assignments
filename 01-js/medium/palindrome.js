@@ -4,6 +4,20 @@
 */
 
 function isPalindrome(str) {
+  let i=0,j=str.length-1;
+  str=str.toLowerCase();
+
+  while(i<j){
+    while(i<j && !(str.charCodeAt(i)>=97 && str.charCodeAt(i)<=122)) i++;
+    while(i<j && !(str.charCodeAt(j)>=97 && str.charCodeAt(j)<=122)) j--;
+    if(i>=j) return true;
+    else{
+      if(str.charAt(i)==str.charAt(j)){
+        i++;
+        j--;
+      }else return false;
+    }
+  }
   return true;
 }
 
