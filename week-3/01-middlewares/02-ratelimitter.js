@@ -12,9 +12,32 @@ const app = express();
 // clears every one second
 
 let numberOfRequestsForUser = {};
-setInterval(() => {
-    numberOfRequestsForUser = {};
-}, 1000)
+
+// Global middleware to limit requests to 5 per second based on user ID
+app.use((req, res, next) => {
+  const userId = req.headers.user-id;
+
+  // Check if the user ID exists in the tracking object
+  if (!numberOfRequestsForUser[userId]) {
+    numberOfRequestsForUser[userId] = 1;
+  } else {
+    numberOfRequestsForUser[userId]++;
+  }
+
+  // Clear the count after one second
+  setTimeout(() => {
+    numberOfRequestsForUser= {};
+  }, 1000);
+
+  // If the number of requests exceeds 5, return 404
+  if (numberOfRequestsForUser[userId] > 5) {
+    return res.status(404).send('Request limit exceeded for this user ID');
+  }
+
+  // Proceed with the request if within the limit
+  next();
+});
+
 
 app.get('/user', function(req, res) {
   res.status(200).json({ name: 'john' });
